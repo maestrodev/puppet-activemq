@@ -2,7 +2,7 @@ class activemq {
   
   user { "$activemq_user":
     ensure     => present,
-    home       => "$activemq_home/$activemq_owner",
+    home       => "$activemq_home/$activemq_user",
     managehome => false,
     shell      => "/bin/false",
   } ->
