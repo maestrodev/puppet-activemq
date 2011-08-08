@@ -1,45 +1,45 @@
 class activemq {
   
-  user { "activemq":
+  user { "$activemq_owner":
     ensure     => present,
-    home       => "/opt/activemq",
+    home       => "$activemq_home/$activemq_owner",
     managehome => false,
     shell      => "/bin/false",
   } ->
-  group { "activemq":
+  group { "$activemq_group":
     ensure  => present,
-    require => User["activemq"],
+    require => User["$activemq_owner"],
   } ->
   exec { "activemq_download":
-    command => "wget http://mirror.cc.columbia.edu/pub/software/apache//activemq/apache-activemq/5.5.0/apache-activemq-5.5.0-bin.tar.gz",
+    command => "wget http://mirror.cc.columbia.edu/pub/software/apache//activemq/apache-activemq/$activemq_version/apache-activemq-$activemq_version-bin.tar.gz",
     cwd     => "/usr/local/src",
-    creates => "/usr/local/src/apache-activemq-5.5.0-bin.tar.gz",
+    creates => "/usr/local/src/apache-activemq-$activemq_version-bin.tar.gz",
     path    => ["/usr/bin", "/usr/sbin"],
-    require => [Group["activemq"],Package["java-1.6.0-openjdk-devel"]],
+    require => [Group["$activemq_group"],Package["java-1.6.0-openjdk-devel"]],
   } ->
   exec { "activemq_untar":
-    command => "tar xf /usr/local/src/apache-activemq-5.5.0-bin.tar.gz && chown -R activemq:activemq /opt/apache-activemq-5.5.0",
-    cwd     => "/opt",
-    creates => "/opt/apache-activemq-5.5.0",
+    command => "tar xf /usr/local/src/apache-activemq-$activemq_version-bin.tar.gz && chown -R $activemq_owner:$activemq_group $activemq_home/apache-activemq-$activemq_version",
+    cwd     => "$activemq_home",
+    creates => "$activemq_home/apache-activemq-$activemq_version",
     path    => ["/bin",],
     require => Exec["activemq_download"],
 #also need to chown activemq:activemq this dir
   } ->
-  file { "/opt/activemq":
-    ensure  => "/opt/apache-activemq-5.5.0",
+  file { "$activemq_home/activemq":
+    ensure  => "$activemq_home/apache-activemq-5.5.0",
     require => Exec["activemq_untar"],
   } ->
   file { "/etc/activemq":
-    ensure  => "/opt/activemq/conf",
-    require => File["/opt/activemq"],
+    ensure  => "$activemq_home/activemq/conf",
+    require => File["$activemq_home/activemq"],
   } ->
   file { "/var/log/activemq":
-    ensure  => "/opt/activemq/data",
-    require => File["/opt/activemq"],
+    ensure  => "$activemq_home/activemq/data",
+    require => File["$activemq_home/activemq"],
   } ->
-  file { "/opt/activemq/bin/linux":
-    ensure  => "/opt/activemq/bin/linux-x86-64ac  ",
-    require => File["/opt/activemq"],
+  file { "$activemq_home/activemq/bin/linux":
+    ensure  => "$activemq_home/activemq/bin/linux-x86-64ac  ",
+    require => File["$activemq_home/activemq"],
   } ->
   file { "/var/run/activemq":
     ensure  => directory,
@@ -54,12 +54,12 @@ class activemq {
     mode    => 755,
     content => template("activemq/activemq-init.d.erb"),
   } ->
-  file { "/opt/apache-activemq-5.5.0/bin/linux-x86-64/wrapper.conf":
+  file { "$activemq_home/apache-activemq-$activemq_version/bin/linux-x86-64/wrapper.conf":
     owner   => activemq,
     group   => activemq,
     mode    => 644,
     source  => "puppet://${servername}/modules/activemq/wrapper.conf",
-    require => File["/opt/activemq"],
+    require => File["$activemq_home/activemq"],
   } ->
   file { "/etc/activemq/activemq.xml":
     owner   => activemq,
@@ -70,7 +70,6 @@ class activemq {
   } ->
   exec { "activemq":
     command => "/etc/init.d/activemq start",    
-   # require    => [File["/etc/init.d/activemq"],File["/var/run/activemq"],File["/etc/activemq/activemq.xml"],File["/opt/apache-activemq-5.5.0/bin/linux-x86-64/wrapper.conf"]],
   }
   
 }
