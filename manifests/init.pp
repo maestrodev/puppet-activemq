@@ -8,7 +8,7 @@ class activemq {
   } ->
   group { "$activemq_group":
     ensure  => present,
-    require => User["$activemq_owner"],
+    require => User["$activemq_user"],
   } ->
   exec { "activemq_download":
     command => "wget http://mirror.cc.columbia.edu/pub/software/apache//activemq/apache-activemq/$activemq_version/apache-activemq-$activemq_version-bin.tar.gz",
