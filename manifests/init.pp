@@ -1,6 +1,6 @@
 class activemq {
   
-  user { "$activemq_owner":
+  user { "$activemq_user":
     ensure     => present,
     home       => "$activemq_home/$activemq_owner",
     managehome => false,
@@ -18,7 +18,7 @@ class activemq {
     require => [Group["$activemq_group"],Package["java-1.6.0-openjdk-devel"]],
   } ->
   exec { "activemq_untar":
-    command => "tar xf /usr/local/src/apache-activemq-$activemq_version-bin.tar.gz && chown -R $activemq_owner:$activemq_group $activemq_home/apache-activemq-$activemq_version",
+    command => "tar xf /usr/local/src/apache-activemq-$activemq_version-bin.tar.gz && chown -R $activemq_user:$activemq_group $activemq_home/apache-activemq-$activemq_version",
     cwd     => "$activemq_home",
     creates => "$activemq_home/apache-activemq-$activemq_version",
     path    => ["/bin",],
