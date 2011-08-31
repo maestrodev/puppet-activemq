@@ -68,8 +68,9 @@ class activemq {
     source  => "puppet://${servername}/modules/activemq/activemq.xml",
     require => File["/etc/activemq"]
   } ->
-  exec { "activemq":
-    command => "/etc/init.d/activemq start",    
+  service { "activemq":
+    ensure => running,
+    enable => true,
   }
   
 }
