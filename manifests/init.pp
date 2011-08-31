@@ -11,14 +11,14 @@ class activemq {
     require => User["$activemq_user"],
   } ->
   exec { "activemq_download":
-    command => "wget http://mirror.cc.columbia.edu/pub/software/apache//activemq/apache-activemq/$activemq_version/apache-activemq-$activemq_version-bin.tar.gz",
+    command => "wget http://mirror.cc.columbia.edu/pub/software/apache//activemq/apache-activemq/$activemq_version/apache-activemq-${activemq_version}-bin.tar.gz",
     cwd     => "/usr/local/src",
-    creates => "/usr/local/src/apache-activemq-$activemq_version-bin.tar.gz",
+    creates => "/usr/local/src/apache-activemq-${activemq_version}-bin.tar.gz",
     path    => ["/usr/bin", "/usr/sbin"],
     require => [Group["$activemq_group"],Package["java-1.6.0-openjdk-devel"]],
   } ->
   exec { "activemq_untar":
-    command => "tar xf /usr/local/src/apache-activemq-$activemq_version-bin.tar.gz && chown -R $activemq_user:$activemq_group $activemq_home/apache-activemq-$activemq_version",
+    command => "tar xf /usr/local/src/apache-activemq-${activemq_version}-bin.tar.gz && chown -R $activemq_user:$activemq_group $activemq_home/apache-activemq-$activemq_version",
     cwd     => "$activemq_home",
     creates => "$activemq_home/apache-activemq-$activemq_version",
     path    => ["/bin",],
