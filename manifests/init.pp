@@ -1,5 +1,6 @@
 class activemq {
-  
+  include wget
+
   user { "$activemq_user":
     ensure     => present,
     home       => "$activemq_home/$activemq_user",
@@ -10,20 +11,23 @@ class activemq {
     ensure  => present,
     require => User["$activemq_user"],
   } ->
-  exec { "activemq_download":
-    command => "wget http://mirror.cc.columbia.edu/pub/software/apache//activemq/apache-activemq/$activemq_version/apache-activemq-${activemq_version}-bin.tar.gz",
-    cwd     => "/usr/local/src",
-    creates => "/usr/local/src/apache-activemq-${activemq_version}-bin.tar.gz",
-    path    => ["/usr/bin", "/usr/sbin"],
+  wget::fetch { "activemq_download":
+    source => "http://mirror.cc.columbia.edu/pub/software/apache//activemq/apache-activemq/$activemq_version/apache-activemq-${activemq_version}-bin.tar.gz",
+    destination => "/usr/local/src/apache-activemq-${activemq_version}-bin.tar.gz",
     require => [Group["$activemq_group"],Package["java-1.6.0-openjdk-devel"]],
   } ->
+#  exec { "activemq_download":
+#    command => "wget http://mirror.cc.columbia.edu/pub/software/apache//activemq/apache-#activemq/$activemq_version/apache-activemq-${activemq_version}-bin.tar.gz",
+#    cwd     => "/usr/local/src",
+#    creates => "/usr/local/src/apache-activemq-${activemq_version}-bin.tar.gz",
+#    path    => ["/usr/bin", "/usr/sbin"],
+#    require => [Group["$activemq_group"],Package["java-1.6.0-openjdk-devel"]],
+#  } ->
   exec { "activemq_untar":
     command => "tar xf /usr/local/src/apache-activemq-${activemq_version}-bin.tar.gz && chown -R $activemq_user:$activemq_group $activemq_home/apache-activemq-$activemq_version",
     cwd     => "$activemq_home",
     creates => "$activemq_home/apache-activemq-$activemq_version",
     path    => ["/bin",],
-    require => Exec["activemq_download"],
-#also need to chown activemq:activemq this dir
   } ->
   file { "$activemq_home/activemq":
     ensure  => "$activemq_home/apache-activemq-5.5.0",
@@ -66,11 +70,17 @@ class activemq {
     group   => activemq,
     mode    => 644,
     source  => "puppet://${servername}/modules/activemq/activemq.xml",
-    require => File["/etc/activemq"]
-  } ->
+    require => File["/etc/activemq"],
+    notify => Service["activemq"]
+  }
+
   service { "activemq":
+    name => "activemq",
     ensure => running,
+    hasrestart => true,
+    hasstatus => false,
     enable => true,
+    subscribe => File["/etc/activemq/activemq.xml"]
   }
   
 }
