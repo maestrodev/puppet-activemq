@@ -514,33 +514,33 @@ dump() {
 case "$1" in
 
     'console')
-        checkUser $1 touchlock
+        #checkUser $1 touchlock
         console
         ;;
 
     'start')
-        checkUser $1 touchlock
+        #checkUser $1 touchlock
         start
         ;;
 
     'stop')
-        checkUser $1
+        #checkUser $1
         stopit
         ;;
 
     'restart')
-        checkUser $1 touchlock
+        #checkUser $1 touchlock
         stopit
         start
         ;;
 
     'status')
-        checkUser $1
+        #checkUser $1
         status
         ;;
 
     'dump')
-        checkUser $1
+        #checkUser $1
         dump
         ;;
 
