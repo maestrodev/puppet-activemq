@@ -30,7 +30,7 @@ class activemq {
     path    => ["/bin",],
   } ->
   file { "$activemq_home/activemq":
-    ensure  => "$activemq_home/apache-activemq-5.5.0",
+    ensure  => "$activemq_home/apache-activemq-$activemq_version",
     require => Exec["activemq_untar"],
   } ->
   file { "/etc/activemq":
@@ -42,7 +42,7 @@ class activemq {
     require => File["$activemq_home/activemq"],
   } ->
   file { "$activemq_home/activemq/bin/linux":
-    ensure  => "$activemq_home/activemq/bin/linux-x86-64ac  ",
+    ensure  => "$activemq_home/activemq/bin/linux-x86-64",
     require => File["$activemq_home/activemq"],
   } ->
   file { "/var/run/activemq":
