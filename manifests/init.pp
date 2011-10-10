@@ -1,56 +1,77 @@
-class activemq {
+# Copyright 2011 MaestroDev
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+# This activemq class is currently targeting an X86_64 deploy, adjust as needed
+
+class activemq($jdk_package = "java-1.6.0-openjdk", 
+               $version = "5.5.0", 
+               $home = "/opt", 
+               $user = "activemq",
+               $group = "activemq") {
+
+  # wget from https://github.com/maestrodev/puppet-wget
   include wget
 
-  user { "$activemq_user":
+  if ! defined (Package[$jdk_package]) {
+    package { $jdk_package: ensure => installed }
+  }
+
+  user { $user:
     ensure     => present,
-    home       => "$activemq_home/$activemq_user",
+    home       => "$home/$user",
     managehome => false,
     shell      => "/bin/false",
-  } ->
-  group { "$activemq_group":
+  }
+
+  group { $group:
     ensure  => present,
-    require => User["$activemq_user"],
-  } ->
+    require => User[$user],
+  }
+
   wget::fetch { "activemq_download":
-    source => "http://mirror.cc.columbia.edu/pub/software/apache//activemq/apache-activemq/$activemq_version/apache-activemq-${activemq_version}-bin.tar.gz",
-    destination => "/usr/local/src/apache-activemq-${activemq_version}-bin.tar.gz",
-    require => [Group["$activemq_group"],Package["java-1.6.0-openjdk-devel"]],
+    source => "http://mirror.cc.columbia.edu/pub/software/apache//activemq/apache-activemq/$version/apache-activemq-${version}-bin.tar.gz",
+    destination => "/usr/local/src/apache-activemq-${version}-bin.tar.gz",
+    require => [User[$user],Group[$group],Package[$jdk_package]],
   } ->
-#  exec { "activemq_download":
-#    command => "wget http://mirror.cc.columbia.edu/pub/software/apache//activemq/apache-#activemq/$activemq_version/apache-activemq-${activemq_version}-bin.tar.gz",
-#    cwd     => "/usr/local/src",
-#    creates => "/usr/local/src/apache-activemq-${activemq_version}-bin.tar.gz",
-#    path    => ["/usr/bin", "/usr/sbin"],
-#    require => [Group["$activemq_group"],Package["java-1.6.0-openjdk-devel"]],
-#  } ->
   exec { "activemq_untar":
-    command => "tar xf /usr/local/src/apache-activemq-${activemq_version}-bin.tar.gz && chown -R $activemq_user:$activemq_group $activemq_home/apache-activemq-$activemq_version",
-    cwd     => "$activemq_home",
-    creates => "$activemq_home/apache-activemq-$activemq_version",
+    command => "tar xf /usr/local/src/apache-activemq-${version}-bin.tar.gz && chown -R $user:$group $home/apache-activemq-$version",
+    cwd     => "$home",
+    creates => "$home/apache-activemq-$version",
     path    => ["/bin",],
   } ->
-  file { "$activemq_home/activemq":
-    ensure  => "$activemq_home/apache-activemq-5.5.0",
+  file { "$home/activemq":
+    ensure  => "$home/apache-activemq-$version",
     require => Exec["activemq_untar"],
   } ->
   file { "/etc/activemq":
-    ensure  => "$activemq_home/activemq/conf",
-    require => File["$activemq_home/activemq"],
+    ensure  => "$home/activemq/conf",
+    require => File["$home/activemq"],
   } ->
   file { "/var/log/activemq":
-    ensure  => "$activemq_home/activemq/data",
-    require => File["$activemq_home/activemq"],
+    ensure  => "$home/activemq/data",
+    require => File["$home/activemq"],
   } ->
-  file { "$activemq_home/activemq/bin/linux":
-    ensure  => "$activemq_home/activemq/bin/linux-x86-64ac  ",
-    require => File["$activemq_home/activemq"],
+  file { "$home/activemq/bin/linux":
+    ensure  => "$home/activemq/bin/linux-x86-64",
+    require => File["$home/activemq"],
   } ->
   file { "/var/run/activemq":
     ensure  => directory,
-    owner   => activemq,
-    group   => activemq,
+    owner   => $user,
+    group   => $group,
     mode    => 755,
-    require => Group["activemq"],
+    require => [User[$user],Group[$group]],
   } ->
   file { "/etc/init.d/activemq":
     owner   => root,
@@ -58,16 +79,16 @@ class activemq {
     mode    => 755,
     content => template("activemq/activemq-init.d.erb"),
   } ->
-  file { "$activemq_home/apache-activemq-$activemq_version/bin/linux-x86-64/wrapper.conf":
-    owner   => activemq,
-    group   => activemq,
+  file { "$home/apache-activemq-$version/bin/linux-x86-64/wrapper.conf":
+    owner   => $user,
+    group   => $group,
     mode    => 644,
     source  => "puppet://${servername}/modules/activemq/wrapper.conf",
-    require => File["$activemq_home/activemq"],
+    require => File["$home/activemq"],
   } ->
   file { "/etc/activemq/activemq.xml":
-    owner   => activemq,
-    group   => activemq,
+    owner   => $user,
+    group   => $group,
     mode    => 644,
     source  => "puppet://${servername}/modules/activemq/activemq.xml",
     require => File["/etc/activemq"],
@@ -80,6 +101,7 @@ class activemq {
     hasrestart => true,
     hasstatus => false,
     enable => true,
+    require => [User["$user"],Group["$group"],Package[$jdk_package]],
     subscribe => File["/etc/activemq/activemq.xml"]
   }
   
