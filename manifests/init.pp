@@ -40,7 +40,8 @@ class activemq($jdk_package = "java-1.6.0-openjdk",
   }
 
   wget::fetch { "activemq_download":
-    source => "http://mirror.cc.columbia.edu/pub/software/apache//activemq/apache-activemq/$version/apache-activemq-${version}-bin.tar.gz",
+    #source => "http://mirrors.ibiblio.org/apache/activemq/apache-activemq/$version/apache-activemq-${version}-bin.tar.gz",
+    source => "https://repo.maestrodev.com/archiva/repository/central/org/apache/activemq/apache-activemq/${version}/apache-activemq-${version}-bin.tar.gz",
     destination => "/usr/local/src/apache-activemq-${version}-bin.tar.gz",
     require => [User[$user],Group[$group],Package[$jdk_package]],
   } ->
