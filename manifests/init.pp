@@ -15,6 +15,7 @@
 # This activemq class is currently targeting an X86_64 deploy, adjust as needed
 
 class activemq($jdk_package = "java-1.6.0-openjdk", 
+               $apache_mirror = "http://archive.apache.org/dist/", 
                $version = "5.5.0", 
                $home = "/opt", 
                $user = "activemq",
@@ -40,7 +41,7 @@ class activemq($jdk_package = "java-1.6.0-openjdk",
   }
 
   wget::fetch { "activemq_download":
-    source => "http://mirror.cc.columbia.edu/pub/software/apache//activemq/apache-activemq/$version/apache-activemq-${version}-bin.tar.gz",
+    source => "$apache_mirror/activemq/apache-activemq/$version/apache-activemq-${version}-bin.tar.gz",
     destination => "/usr/local/src/apache-activemq-${version}-bin.tar.gz",
     require => [User[$user],Group[$group],Package[$jdk_package]],
   } ->
