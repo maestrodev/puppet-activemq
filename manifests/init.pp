@@ -80,20 +80,37 @@ class activemq($jdk_package = "java-1.6.0-openjdk",
     group   => root,
     mode    => 755,
     content => template("activemq/activemq-init.d.erb"),
-  } ->
-  file { "$home/apache-activemq-$version/bin/linux-x86-64/wrapper.conf":
-    owner   => $user,
-    group   => $group,
-    mode    => 644,
-    content => template("activemq/wrapper.conf.erb"),
-    require => File["$home/activemq"],
-  } ->
+  }
+
+  case $architecture {
+    'x86_64': {
+      file { "wrapper.conf":
+        path    => "$home/apache-activemq-$version/bin/linux-x86-64/wrapper.conf",
+        owner   => $user,
+        group   => $group,
+        mode    => 644,
+        content => template("activemq/wrapper.conf.erb"),
+        require => [File["$home/activemq"],File["/etc/init.d/activemq"]]
+      }  
+    }
+    'i386': {
+      file { "wrapper.conf":
+        path    => "$home/apache-activemq-$version/bin/linux-x86-32/wrapper.conf",
+        owner   => $user,
+        group   => $group,
+        mode    => 644,
+        content => template("activemq/wrapper.conf.erb"),
+        require => [File["$home/activemq"],File["/etc/init.d/activemq"]]
+      }
+    }
+  }
+
   file { "/etc/activemq/activemq.xml":
     owner   => $user,
     group   => $group,
     mode    => 644,
     source  => "puppet://${servername}/modules/activemq/activemq.xml",
-    require => File["/etc/activemq"],
+    require => [File["wrapper.conf"],File["/etc/activemq"]],
     notify => Service["activemq"]
   }
 
