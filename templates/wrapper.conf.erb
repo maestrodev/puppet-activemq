@@ -69,7 +69,11 @@ wrapper.java.additional.9=-Djava.util.logging.config.file=logging.properties
 #wrapper.java.initmemory=3
 
 # Maximum Java Heap Size (in MB)
+<% if max_memory %>
+wrapper.java.maxmemory=<%= max_memory %>
+<% else %>
 wrapper.java.maxmemory=512
+<% end %>
 
 # Application parameters.  Add parameters as needed starting from 1
 wrapper.app.parameter.1=org.apache.activemq.console.Main

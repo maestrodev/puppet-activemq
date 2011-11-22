@@ -19,7 +19,8 @@ class activemq($jdk_package = "java-1.6.0-openjdk",
                $version = "5.5.0", 
                $home = "/opt", 
                $user = "activemq",
-               $group = "activemq") {
+               $group = "activemq",
+               $max_memory = "512") {
 
   # wget from https://github.com/maestrodev/puppet-wget
   include wget
@@ -84,7 +85,7 @@ class activemq($jdk_package = "java-1.6.0-openjdk",
     owner   => $user,
     group   => $group,
     mode    => 644,
-    source  => "puppet://${servername}/modules/activemq/wrapper.conf",
+    content => template("activemq/wrapper.conf.erb"),
     require => File["$home/activemq"],
   } ->
   file { "/etc/activemq/activemq.xml":
