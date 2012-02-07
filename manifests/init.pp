@@ -20,6 +20,7 @@ class activemq($jdk_package = "java-1.6.0-openjdk",
                $home = "/opt", 
                $user = "activemq",
                $group = "activemq",
+               $system_user = true,
                $max_memory = "512") {
 
   # wget from https://github.com/maestrodev/puppet-wget
@@ -34,10 +35,12 @@ class activemq($jdk_package = "java-1.6.0-openjdk",
     home       => "$home/$user",
     managehome => false,
     shell      => "/bin/false",
+    system     => $system_user,
   }
 
   group { $group:
     ensure  => present,
+    system  => $system_user,
     require => User[$user],
   }
 
