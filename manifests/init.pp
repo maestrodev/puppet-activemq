@@ -86,7 +86,7 @@ class activemq($jdk_package = "java-1.6.0-openjdk",
   }
 
   case $architecture {
-    'x86_64': {
+    'x86_64','amd64': {
       file { "wrapper.conf":
         path    => "$home/apache-activemq-$version/bin/linux-x86-64/wrapper.conf",
         owner   => $user,
