@@ -112,7 +112,7 @@ class activemq($jdk_package = "java-1.6.0-openjdk",
     owner   => $user,
     group   => $group,
     mode    => 644,
-    source  => "puppet://${servername}/modules/activemq/activemq.xml",
+    source  => "puppet:///modules/activemq/activemq.xml",
     require => [File["wrapper.conf"],File["/etc/activemq"]],
     notify => Service["activemq"]
   }
