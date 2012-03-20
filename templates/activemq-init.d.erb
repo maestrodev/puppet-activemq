@@ -31,12 +31,12 @@ APP_LONG_NAME="ActiveMQ Broker"
 ACTIVEMQ_HOME="<%= home %>/activemq"
 
 # Wrapper
-<% if architecture == "x86_64" %>
+<% if @architecture == "x86_64" %>
 WRAPPER_CMD="/opt/activemq/bin/linux-x86-64/wrapper"
 WRAPPER_CONF="/opt/activemq/bin/linux-x86-64/wrapper.conf"
 <% end %>
 
-<% if architecture == "i386" %>
+<% if @architecture == "i386" %>
 WRAPPER_CMD="/opt/activemq/bin/linux-x86-32/wrapper"
 WRAPPER_CONF="/opt/activemq/bin/linux-x86-32/wrapper.conf"
 <% end %>
