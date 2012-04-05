@@ -28,18 +28,12 @@
 # Application
 APP_NAME="ActiveMQ"
 APP_LONG_NAME="ActiveMQ Broker"
-ACTIVEMQ_HOME="<%= home %>/activemq"
+ACTIVEMQ_HOME="/opt/activemq"
 
 # Wrapper
-<% if @architecture == "x86_64" -%>
 WRAPPER_CMD="/opt/activemq/bin/linux-x86-64/wrapper"
 WRAPPER_CONF="/opt/activemq/bin/linux-x86-64/wrapper.conf"
-<% end -%>
 
-<% if @architecture == "i386" -%>
-WRAPPER_CMD="/opt/activemq/bin/linux-x86-32/wrapper"
-WRAPPER_CONF="/opt/activemq/bin/linux-x86-32/wrapper.conf"
-<% end -%>
 
 # Priority at which to run the wrapper.  See "man nice" for valid priorities.
 #  nice is only used if a priority is specified.
@@ -61,7 +55,7 @@ PIDDIR="/var/run/activemq"
 # NOTE - This will set the user which is used to run the Wrapper as well as
 #  the JVM and is not useful in situations where a privileged resource or
 #  port needs to be allocated prior to the user being changed.
-RUN_AS_USER=<%= user %>
+RUN_AS_USER=activemq
 
 # The following two lines are used by the chkconfig command. Change as is
 #  appropriate for your application.  They should remain commented.
