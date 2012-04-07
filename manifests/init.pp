@@ -93,7 +93,8 @@ class activemq($jdk_package = "java-1.6.0-openjdk",
         group   => $group,
         mode    => 644,
         content => template("activemq/wrapper.conf.erb"),
-        require => [File["$home/activemq"],File["/etc/init.d/activemq"]]
+        require => [File["$home/activemq"],File["/etc/init.d/activemq"]],
+        notify  => Service["activemq"],
       }  
     }
     'i386': {
@@ -103,7 +104,8 @@ class activemq($jdk_package = "java-1.6.0-openjdk",
         group   => $group,
         mode    => 644,
         content => template("activemq/wrapper.conf.erb"),
-        require => [File["$home/activemq"],File["/etc/init.d/activemq"]]
+        require => [File["$home/activemq"],File["/etc/init.d/activemq"]],
+        notify  => Service["activemq"],
       }
     }
   }
