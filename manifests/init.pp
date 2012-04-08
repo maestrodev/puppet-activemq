@@ -14,8 +14,7 @@
 
 # This activemq class is currently targeting an X86_64 deploy, adjust as needed
 
-class activemq($jdk_package = "java-1.6.0-openjdk", 
-               $apache_mirror = "http://archive.apache.org/dist/", 
+class activemq($apache_mirror = "http://archive.apache.org/dist/",
                $version = "5.5.0", 
                $home = "/opt", 
                $user = "activemq",
@@ -26,28 +25,28 @@ class activemq($jdk_package = "java-1.6.0-openjdk",
   # wget from https://github.com/maestrodev/puppet-wget
   include wget
 
-  if ! defined (Package[$jdk_package]) {
-    package { $jdk_package: ensure => installed }
+  if ! defined (User[$user]) {
+    user { $user:
+      ensure     => present,
+      home       => "$home/$user",
+      managehome => false,
+      shell      => "/bin/false",
+      system     => $system_user,
+    }
   }
 
-  user { $user:
-    ensure     => present,
-    home       => "$home/$user",
-    managehome => false,
-    shell      => "/bin/false",
-    system     => $system_user,
-  }
-
-  group { $group:
-    ensure  => present,
-    system  => $system_user,
-    require => User[$user],
+  if ! defined (Group[$group]) {
+    group { $group:
+      ensure  => present,
+      system  => $system_user,
+      require => User[$user],
+    }
   }
 
   wget::fetch { "activemq_download":
     source => "$apache_mirror/activemq/apache-activemq/$version/apache-activemq-${version}-bin.tar.gz",
     destination => "/usr/local/src/apache-activemq-${version}-bin.tar.gz",
-    require => [User[$user],Group[$group],Package[$jdk_package]],
+    require => [User[$user],Group[$group]],
   } ->
   exec { "activemq_untar":
     command => "tar xf /usr/local/src/apache-activemq-${version}-bin.tar.gz && chown -R $user:$group $home/apache-activemq-$version",
@@ -116,7 +115,7 @@ class activemq($jdk_package = "java-1.6.0-openjdk",
     hasrestart => true,
     hasstatus => false,
     enable => true,
-    require => [User["$user"],Group["$group"],Package[$jdk_package]],
+    require => [User["$user"],Group["$group"]],
     subscribe => File["/etc/activemq/activemq.xml"]
   }
   
