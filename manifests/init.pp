@@ -116,7 +116,6 @@ class activemq($apache_mirror = "http://archive.apache.org/dist/",
     hasstatus => false,
     enable => true,
     require => [User["$user"],Group["$group"]],
-    subscribe => File["/etc/activemq/activemq.xml"]
   }
   
 }
