@@ -19,7 +19,7 @@ class activemq($apache_mirror = "http://archive.apache.org/dist/",
                $home = "/opt", 
                $user = "activemq",
                $group = "activemq",
-               $system_user = true,
+               $system_user = false,
                $max_memory = "512") {
 
   # wget from https://github.com/maestrodev/puppet-wget
@@ -30,7 +30,6 @@ class activemq($apache_mirror = "http://archive.apache.org/dist/",
       ensure     => present,
       home       => "$home/$user",
       managehome => false,
-      shell      => "/bin/false",
       system     => $system_user,
     }
   }
