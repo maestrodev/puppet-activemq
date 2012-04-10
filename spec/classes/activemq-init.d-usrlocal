@@ -59,7 +59,7 @@ RUN_AS_USER=activemq
 
 # The following two lines are used by the chkconfig command. Change as is
 #  appropriate for your application.  They should remain commented.
-# chkconfig: 2345 20 80
+# chkconfig: 2345 70 20
 # description: @app.long.name@
 
 # Do not modify anything beyond this point
