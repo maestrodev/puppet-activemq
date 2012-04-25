@@ -54,6 +54,8 @@ class activemq($apache_mirror = "http://archive.apache.org/dist/",
     path    => ["/bin",],
   } ->
   file { "$home/activemq":
+    owner  => $user,
+    group  => $group,
     ensure  => "$home/apache-activemq-$version",
     require => Exec["activemq_untar"],
   } ->
