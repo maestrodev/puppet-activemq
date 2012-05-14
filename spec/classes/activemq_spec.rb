@@ -8,9 +8,11 @@ describe 'activemq' do
   context "when using default parameters" do
     it 'should generate valid init.d' do
       should contain_file("/etc/init.d/activemq")
-      expected = IO.read(File.expand_path('activemq-init.d', File.dirname(__FILE__)))
       content = catalogue.resource('file', '/etc/init.d/activemq').send(:parameters)[:content]
-      content.should == expected
+      content.should =~ %r[ACTIVEMQ_HOME="/opt/activemq"]
+      content.should =~ %r[WRAPPER_CMD="/opt/activemq/bin/linux-x86-64/wrapper"]
+      content.should =~ %r[WRAPPER_CONF="/opt/activemq/bin/linux-x86-64/wrapper.conf"]
+      content.should =~ %r[RUN_AS_USER=activemq]
     end
 
     it "should generate a valid wrapper.conf" do
@@ -28,9 +30,11 @@ describe 'activemq' do
     } }
     it 'should generate valid init.d' do
       should contain_file("/etc/init.d/activemq")
-      expected = IO.read(File.expand_path('activemq-init.d-usrlocal', File.dirname(__FILE__)))
       content = catalogue.resource('file', '/etc/init.d/activemq').send(:parameters)[:content]
-      content.should == expected
+      content.should =~ %r[ACTIVEMQ_HOME="/usr/local/activemq"]
+      content.should =~ %r[WRAPPER_CMD="/usr/local/activemq/bin/linux-x86-64/wrapper"]
+      content.should =~ %r[WRAPPER_CONF="/usr/local/activemq/bin/linux-x86-64/wrapper.conf"]
+      content.should =~ %r[RUN_AS_USER=activemq]
     end
 
     it "should generate a valid wrapper.conf" do
