@@ -20,7 +20,8 @@ class activemq($apache_mirror = "http://archive.apache.org/dist/",
                $user = "activemq",
                $group = "activemq",
                $system_user = true,
-               $max_memory = "512") {
+               $max_memory = "512",
+               $console = true) {
 
   # wget from https://github.com/maestrodev/puppet-wget
   include wget
@@ -83,6 +84,18 @@ class activemq($apache_mirror = "http://archive.apache.org/dist/",
     group   => root,
     mode    => 755,
     content => template("activemq/activemq-init.d.erb"),
+  }
+
+  if ! $console {
+    augeas { 'activemq-console':
+      changes => [
+        'rm beans/import',
+      ],
+      incl    => "${activemq::home}/activemq/conf/activemq.xml",
+      lens    => 'Xml.lns',
+      require => File["${activemq::home}/activemq"],
+      notify  => Service['activemq'],
+    }
   }
 
   case $architecture {

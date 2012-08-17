@@ -22,6 +22,8 @@ describe 'activemq' do
       content.should =~ %r[ACTIVEMQ_BASE=/opt/activemq]
       content.should =~ %r[wrapper.java.maxmemory=512]
     end
+
+    it { should_not contain_augeas('activemq-console') }
   end
 
   context "when using custom home" do
@@ -55,6 +57,14 @@ describe 'activemq' do
       content = catalogue.resource('file', 'wrapper.conf').send(:parameters)[:content]
       content.should =~ %r[wrapper.java.maxmemory=256]
     end
+  end
+
+  context "when disabling the console" do
+    let(:params) { {
+      :console => false
+    } }
+
+    it { should contain_augeas('activemq-console').with_changes =~ /rm beans\/import/ }
   end
 
 end
