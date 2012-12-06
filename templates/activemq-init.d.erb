@@ -31,15 +31,8 @@ APP_LONG_NAME="ActiveMQ Broker"
 ACTIVEMQ_HOME="<%= home %>/activemq"
 
 # Wrapper
-<% if @architecture == "x86_64" -%>
-WRAPPER_CMD="<%= home %>/activemq/bin/linux-x86-64/wrapper"
-WRAPPER_CONF="<%= home %>/activemq/bin/linux-x86-64/wrapper.conf"
-<% end -%>
-
-<% if @architecture == "i386" -%>
-WRAPPER_CMD="<%= home %>/activemq/bin/linux-x86-32/wrapper"
-WRAPPER_CONF="<%= home %>/activemq/bin/linux-x86-32/wrapper.conf"
-<% end -%>
+RAPPER_CMD="<%= home %>/activemq/bin/linux-x86-<%= architecture_flag  %>/wrapper"
+WRAPPER_CONF="<%= home %>/activemq/bin/linux-x86-<%= architecture_flag  %>/wrapper.conf"
 
 # Priority at which to run the wrapper.  See "man nice" for valid priorities.
 #  nice is only used if a priority is specified.
@@ -74,6 +67,10 @@ RUN_AS_USER=<%= user %>
 # load system-wide activemq configuration
 if [ -f "/etc/sysconfig/activemq" ] ; then
   . /etc/sysconfig/activemq
+fi
+
+if [ -f "/etc/default/activemq" ] ; then
+  . /etc/default/activemq
 fi
 
 # Get the fully qualified path to the script
