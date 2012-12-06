@@ -15,8 +15,8 @@
 # This activemq class is currently targeting an X86_64 deploy, adjust as needed
 
 class activemq($apache_mirror = "http://archive.apache.org/dist/",
-               $version = "5.5.0", 
-               $home = "/opt", 
+               $version = "5.5.0",
+               $home = "/opt",
                $user = "activemq",
                $group = "activemq",
                $system_user = true,
@@ -41,6 +41,16 @@ class activemq($apache_mirror = "http://archive.apache.org/dist/",
       system  => $system_user,
       require => User[$user],
     }
+  }
+  # path flag for the activemq init script template
+  case $architecture {
+    'x86_64','amd64': {
+      $architecture_flag = '64'
+    }
+    'i386': {
+      $architecture_flag = '32'
+    }
+    default: { fail("Unsupported architecture ${architecture}") }
   }
 
   wget::fetch { "activemq_download":
@@ -108,7 +118,7 @@ class activemq($apache_mirror = "http://archive.apache.org/dist/",
         content => template("activemq/wrapper.conf.erb"),
         require => [File["$home/activemq"],File["/etc/init.d/activemq"]],
         notify  => Service["activemq"],
-      }  
+      }
     }
     'i386': {
       file { "wrapper.conf":
@@ -131,5 +141,5 @@ class activemq($apache_mirror = "http://archive.apache.org/dist/",
     enable => true,
     require => [User["$user"],Group["$group"]],
   }
-  
+
 }
