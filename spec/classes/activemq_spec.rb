@@ -1,4 +1,4 @@
-require "#{File.join(File.dirname(__FILE__),'..','spec_helper')}"
+require 'spec_helper'
 
 describe 'activemq' do
   let(:facts) { {:architecture => 'x86_64'} }
