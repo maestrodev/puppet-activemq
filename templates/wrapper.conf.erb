@@ -76,7 +76,7 @@ wrapper.java.additional.11=-Dactivemq.data=%ACTIVEMQ_DATA%
 <% if max_memory %>
 wrapper.java.maxmemory=<%= max_memory %>
 <% else %>
-wrapper.java.maxmemory=512
+wrapper.java.maxmemory=1024
 <% end %>
 
 # Application parameters.  Add parameters as needed starting from 1
@@ -93,7 +93,7 @@ wrapper.console.format=PM
 wrapper.console.loglevel=INFO
 
 # Log file to use for wrapper output logging.
-wrapper.logfile=%ACTIVEMQ_BASE%/data/wrapper.log
+wrapper.logfile=%ACTIVEMQ_DATA%/wrapper.log
 
 # Format of output for the log file.  (See docs for formats)
 wrapper.logfile.format=LPTM

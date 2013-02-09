@@ -20,7 +20,7 @@ class activemq($apache_mirror = "http://archive.apache.org/dist/",
                $user = "activemq",
                $group = "activemq",
                $system_user = true,
-               $max_memory = "512",
+               $max_memory = "1024",
                $console = true) {
 
   # wget from https://github.com/maestrodev/puppet-wget
