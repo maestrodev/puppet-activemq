@@ -9,7 +9,7 @@ Get the module to your modules/ subdirectory.
 Then add this to a manifest:
 
     class { 'activemq':
-      version => '5.5.0',
+      version => '5.6.0',
       user    => 'bob',
       group   => 'bob',
       home    => '/opt',
