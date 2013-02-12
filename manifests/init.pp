@@ -15,12 +15,12 @@
 # This activemq class is currently targeting an X86_64 deploy, adjust as needed
 
 class activemq($apache_mirror = "http://archive.apache.org/dist/",
-               $version = "5.5.0",
+               $version = "5.6.0",
                $home = "/opt",
                $user = "activemq",
                $group = "activemq",
                $system_user = true,
-               $max_memory = "512",
+               $max_memory = "1024",
                $console = true) {
 
   # wget from https://github.com/maestrodev/puppet-wget
