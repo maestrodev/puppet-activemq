@@ -9,18 +9,18 @@ describe 'activemq' do
     it 'should generate valid init.d' do
       should contain_file("/etc/init.d/activemq")
       content = catalogue.resource('file', '/etc/init.d/activemq').send(:parameters)[:content]
-      content.should =~ %r[ACTIVEMQ_HOME="/opt/activemq"]
-      content.should =~ %r[WRAPPER_CMD="/opt/activemq/bin/linux-x86-64/wrapper"]
-      content.should =~ %r[WRAPPER_CONF="/opt/activemq/bin/linux-x86-64/wrapper.conf"]
-      content.should =~ %r[RUN_AS_USER=activemq]
+      content.should match(%r[ACTIVEMQ_HOME="/opt/activemq"])
+      content.should match(%r[WRAPPER_CMD="/opt/activemq/bin/linux-x86-64/wrapper"])
+      content.should match(%r[WRAPPER_CONF="/opt/activemq/bin/linux-x86-64/wrapper.conf"])
+      content.should match(%r[RUN_AS_USER=activemq])
     end
 
     it "should generate a valid wrapper.conf" do
       should contain_file('wrapper.conf')
       content = catalogue.resource('file', 'wrapper.conf').send(:parameters)[:content]
-      content.should =~ %r[ACTIVEMQ_HOME=/opt/activemq]
-      content.should =~ %r[ACTIVEMQ_BASE=/opt/activemq]
-      content.should =~ %r[wrapper.java.maxmemory=512]
+      content.should match(%r[ACTIVEMQ_HOME=/opt/activemq])
+      content.should match(%r[ACTIVEMQ_BASE=/opt/activemq])
+      content.should match(%r[wrapper.java.maxmemory=512])
     end
 
     it { should_not contain_augeas('activemq-console') }
@@ -33,17 +33,17 @@ describe 'activemq' do
     it 'should generate valid init.d' do
       should contain_file("/etc/init.d/activemq")
       content = catalogue.resource('file', '/etc/init.d/activemq').send(:parameters)[:content]
-      content.should =~ %r[ACTIVEMQ_HOME="/usr/local/activemq"]
-      content.should =~ %r[WRAPPER_CMD="/usr/local/activemq/bin/linux-x86-64/wrapper"]
-      content.should =~ %r[WRAPPER_CONF="/usr/local/activemq/bin/linux-x86-64/wrapper.conf"]
-      content.should =~ %r[RUN_AS_USER=activemq]
+      content.should match(%r[ACTIVEMQ_HOME="/usr/local/activemq"])
+      content.should match(%r[WRAPPER_CMD="/usr/local/activemq/bin/linux-x86-64/wrapper"])
+      content.should match(%r[WRAPPER_CONF="/usr/local/activemq/bin/linux-x86-64/wrapper.conf"])
+      content.should match(%r[RUN_AS_USER=activemq])
     end
 
     it "should generate a valid wrapper.conf" do
       should contain_file('wrapper.conf')
       content = catalogue.resource('file', 'wrapper.conf').send(:parameters)[:content]
-      content.should =~ %r[ACTIVEMQ_HOME=/usr/local/activemq]
-      content.should =~ %r[ACTIVEMQ_BASE=/usr/local/activemq]
+      content.should match(%r[ACTIVEMQ_HOME=/usr/local/activemq])
+      content.should match(%r[ACTIVEMQ_BASE=/usr/local/activemq])
     end
   end
 
@@ -55,7 +55,7 @@ describe 'activemq' do
     it "should generate a valid wrapper.conf" do
       should contain_file('wrapper.conf')
       content = catalogue.resource('file', 'wrapper.conf').send(:parameters)[:content]
-      content.should =~ %r[wrapper.java.maxmemory=256]
+      content.should match(%r[wrapper.java.maxmemory=256])
     end
   end
 
@@ -64,7 +64,7 @@ describe 'activemq' do
       :console => false
     } }
 
-    it { should contain_augeas('activemq-console').with_changes =~ /rm beans\/import/ }
+    it { should contain_augeas('activemq-console').with_changes(%r[rm beans/import]) }
   end
 
 end
