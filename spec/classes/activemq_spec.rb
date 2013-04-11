@@ -20,7 +20,7 @@ describe 'activemq' do
       content = catalogue.resource('file', 'wrapper.conf').send(:parameters)[:content]
       content.should match(%r[ACTIVEMQ_HOME=/opt/activemq])
       content.should match(%r[ACTIVEMQ_BASE=/opt/activemq])
-      content.should match(%r[wrapper.java.maxmemory=512])
+      content.should match(%r[wrapper.java.maxmemory=1024])
     end
 
     it { should_not contain_augeas('activemq-console') }
