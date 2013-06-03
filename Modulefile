@@ -1,5 +1,5 @@
 name    'maestrodev-activemq'
-version '1.2.0'
+version '1.2.1'
 source 'http://github.com/maestrodev/puppet-activemq.git'
 author 'maestrodev'
 license 'Apache License, Version 2.0'
