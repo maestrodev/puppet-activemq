@@ -15,7 +15,7 @@
 # This activemq class is currently targeting an X86_64 deploy, adjust as needed
 
 class activemq($apache_mirror = "http://archive.apache.org/dist/",
-               $version = "5.6.0",
+               $version = "5.8.0",
                $home = "/opt",
                $user = "activemq",
                $group = "activemq",
