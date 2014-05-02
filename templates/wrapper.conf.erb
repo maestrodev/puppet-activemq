@@ -78,11 +78,7 @@ wrapper.java.additional.15=-Djava.security.auth.login.config=%ACTIVEMQ_CONF%/log
 #wrapper.java.initmemory=3
 
 # Maximum Java Heap Size (in MB)
-<% if @max_memory %>
-wrapper.java.maxmemory=<%= @max_memory %>
-<% else %>
 wrapper.java.maxmemory=1024
-<% end %>
 
 # Application parameters.  Add parameters as needed starting from 1
 wrapper.app.parameter.1=org.apache.activemq.console.Main
