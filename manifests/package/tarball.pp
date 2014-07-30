@@ -25,30 +25,30 @@ class activemq::package::tarball (
     }
   }
 
-  wget::fetch { "activemq_download":
-    source => "${activemq::apache_mirror}/activemq/apache-activemq/${version}/apache-activemq-${version}-bin.tar.gz",
+  wget::fetch { 'activemq_download':
+    source      => "${activemq::apache_mirror}/activemq/apache-activemq/${version}/apache-activemq-${version}-bin.tar.gz",
     destination => "/usr/local/src/apache-activemq-${version}-bin.tar.gz",
-    require => [User[$user],Group[$group]],
+    require     => [User[$user],Group[$group]],
   } ->
-  exec { "activemq_untar":
+  exec { 'activemq_untar':
     command => "tar xf /usr/local/src/apache-activemq-${version}-bin.tar.gz && chown -R ${user}:${group} ${home}/apache-activemq-${version}",
     cwd     => $home,
     creates => "${home}/apache-activemq-${activemq::version}",
-    path    => ["/bin"],
+    path    => ['/bin'],
     before  => File["${home}/activemq"],
   }
 
   file { "${home}/activemq":
-    owner  => $user,
-    group  => $group,
-    ensure  => "$home/apache-activemq-$version",
-    require => Exec["activemq_untar"],
+    ensure  => "${home}/apache-activemq-${version}",
+    owner   => $user,
+    group   => $group,
+    require => Exec['activemq_untar'],
   } ->
-  file { "/etc/activemq":
+  file { '/etc/activemq':
     ensure  => "${home}/activemq/conf",
     require => File["${home}/activemq"],
   } ->
-  file { "/var/log/activemq":
+  file { '/var/log/activemq':
     ensure  => "${home}/activemq/data",
     require => File["${home}/activemq"],
   } ->
@@ -56,26 +56,26 @@ class activemq::package::tarball (
     ensure  => "${home}/activemq/bin/linux-x86-64",
     require => File["${home}/activemq"],
   } ->
-  file { "/var/run/activemq":
+  file { '/var/run/activemq':
     ensure  => directory,
     owner   => $user,
     group   => $group,
-    mode    => 755,
+    mode    => '0755',
   } ->
-  file { "/etc/init.d/activemq":
+  file { '/etc/init.d/activemq':
     owner   => root,
     group   => root,
-    mode    => 755,
-    content => template("activemq/activemq-init.d.erb"),
+    mode    => '0755',
+    content => template('activemq/activemq-init.d.erb'),
   }
 
-  file { "wrapper.conf":
+  file { 'wrapper.conf':
     path    => $activemq::wrapper,
     owner   => $user,
     group   => $group,
-    mode    => 644,
-    content => template("activemq/wrapper.conf.erb"),
-    require => [File["${home}/activemq"],File["/etc/init.d/activemq"]],
+    mode    => '0644',
+    content => template('activemq/wrapper.conf.erb'),
+    require => [File["${home}/activemq"],File['/etc/init.d/activemq']],
     notify  => Service['activemq'],
   }
 }

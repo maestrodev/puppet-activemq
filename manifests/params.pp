@@ -10,13 +10,13 @@ class activemq::params (
 ) {
 
   # path flag for the activemq init script template
-  case $architecture {
+  case $::architecture {
     'x86_64','amd64': {
       $architecture_flag = '64'
     }
     'i386': {
       $architecture_flag = '32'
     }
-    default: { fail("Unsupported architecture ${architecture}") }
+    default: { fail("Unsupported architecture ${::architecture}") }
   }
 }
