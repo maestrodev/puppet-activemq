@@ -14,17 +14,20 @@
 
 # This activemq class is currently targeting an X86_64 deploy, adjust as needed
 
-class activemq(
-  $apache_mirror = $activemq::params::apache_mirror,
-  $version = undef,
-  $home = $activemq::params::home,
-  $user = $activemq::params::user,
-  $group = $activemq::params::group,
-  $system_user = $activemq::params::system_user,
-  $max_memory = $activemq::params::max_memory,
-  $console = $activemq::params::console,
-  $package_type = $activemq::params::package_type,
-  $architecture_flag = $activemq::params::architecture_flag) inherits activemq::params {
+class activemq (
+  $apache_mirror      = $activemq::params::apache_mirror,
+  $version            = undef,
+  $home               = $activemq::params::home,
+  $user               = $activemq::params::user,
+  $group              = $activemq::params::group,
+  $system_user        = $activemq::params::system_user,
+  $manage_user        = $activemq::params::manage_user,
+  $manage_group       = $activemq::params::manage_group,
+  $max_memory         = $activemq::params::max_memory,
+  $console            = $activemq::params::console,
+  $package_type       = $activemq::params::package_type,
+  $architecture_flag  = $activemq::params::architecture_flag,
+) inherits activemq::params {
 
   $wrapper = $package_type ? {
     'tarball' => "${home}/activemq/bin/linux-x86-${architecture_flag}/wrapper.conf",
@@ -63,7 +66,7 @@ class activemq(
     augeas { 'activemq-maxmemory':
       changes => [ "set wrapper.java.maxmemory ${max_memory}" ],
       incl    => $wrapper,
-      lens    => "Properties.lns",
+      lens    => 'Properties.lns',
       require => Anchor['activemq::package::end'],
       notify  => Service['activemq'],
     }

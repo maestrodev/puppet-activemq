@@ -1,5 +1,7 @@
 # Configure ActiveMQ to use Stomp connector
-class activemq::stomp( $port = 61613 ){
+class activemq::stomp (
+  $port = 61613,
+) {
 
   augeas { 'activemq-stomp':
     changes => [
