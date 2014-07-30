@@ -34,9 +34,9 @@ class activemq::package::tarball (
     command => "tar xf /usr/local/src/apache-activemq-${version}-bin.tar.gz && chown -R ${user}:${group} ${home}/apache-activemq-${version}",
     cwd     => $home,
     creates => "${home}/apache-activemq-${activemq::version}",
-    path    => ['/bin'],
+    path    => ['/bin', '/usr/bin'],
     before  => File["${home}/activemq"],
-    unless  => "test -f ${home}/apache-activemq-${version}",
+    unless  => "test -d ${home}/apache-activemq-${version}",
   }
 
   file { "${home}/activemq":
