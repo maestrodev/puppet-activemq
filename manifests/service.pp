@@ -1,8 +1,9 @@
-class activemq::service() inherits activemq::params {
+class activemq::service (
+) inherits activemq::params {
 
   service { 'activemq':
-    name       => 'activemq',
     ensure     => running,
+    name       => 'activemq',
     hasrestart => true,
     hasstatus  => false,
     enable     => true,
