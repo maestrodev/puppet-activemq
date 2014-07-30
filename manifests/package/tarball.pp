@@ -4,31 +4,38 @@ class activemq::package::tarball (
   $user         = $activemq::user,
   $group        = $activemq::group,
   $system_user  = $activemq::system_user,
+  $manage_user  = $activemq::manage_user,
+  $manage_group = $activemq::manage_group,
 ) {
 
   # wget from https://github.com/maestrodev/puppet-wget
   include wget
 
-  if ! defined (User[$user]) {
-    user { $user:
-      ensure     => present,
-      home       => "${home}/${user}",
-      managehome => false,
-      system     => $system_user,
+  if $manage_user {
+    if ! defined (User[$user]) {
+      user { $user:
+        ensure     => present,
+        home       => "${home}/${user}",
+        managehome => false,
+        system     => $system_user,
+        before     => Wget::Fetch['activemq_download'],
+      }
     }
   }
 
-  if ! defined (Group[$group]) {
-    group { $group:
-      ensure  => present,
-      system  => $system_user,
+  if $manage_group {
+    if ! defined (Group[$group]) {
+      group { $group:
+        ensure  => present,
+        system  => $system_user,
+        before  => Wget::Fetch['activemq_download'],
+      }
     }
   }
 
   wget::fetch { 'activemq_download':
     source      => "${activemq::apache_mirror}/activemq/apache-activemq/${version}/apache-activemq-${version}-bin.tar.gz",
     destination => "/usr/local/src/apache-activemq-${version}-bin.tar.gz",
-    require     => [User[$user],Group[$group]],
   } ->
   exec { 'activemq_untar':
     command => "tar xf /usr/local/src/apache-activemq-${version}-bin.tar.gz && chown -R ${user}:${group} ${home}/apache-activemq-${version}",
