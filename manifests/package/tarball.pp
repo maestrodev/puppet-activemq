@@ -4,24 +4,30 @@ class activemq::package::tarball (
   $user         = $activemq::user,
   $group        = $activemq::group,
   $system_user  = $activemq::system_user,
+  $manage_user  = $activemq::manage_user,
+  $manage_group = $activemq::manage_group,
 ) {
 
   # wget from https://github.com/maestrodev/puppet-wget
   include wget
 
-  if ! defined (User[$user]) {
-    user { $user:
-      ensure     => present,
-      home       => "${home}/${user}",
-      managehome => false,
-      system     => $system_user,
+  if $manage_user {
+    if ! defined (User[$user]) {
+      user { $user:
+        ensure     => present,
+        home       => "${home}/${user}",
+        managehome => false,
+        system     => $system_user,
+      }
     }
   }
 
-  if ! defined (Group[$group]) {
-    group { $group:
-      ensure  => present,
-      system  => $system_user,
+  if $manage_group {
+    if ! defined (Group[$group]) {
+      group { $group:
+        ensure  => present,
+        system  => $system_user,
+      }
     }
   }
 

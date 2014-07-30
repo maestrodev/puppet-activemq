@@ -21,6 +21,8 @@ class activemq (
   $user               = $activemq::params::user,
   $group              = $activemq::params::group,
   $system_user        = $activemq::params::system_user,
+  $manage_user        = $activemq::params::manage_user,
+  $manage_group       = $activemq::params::manage_group,
   $max_memory         = $activemq::params::max_memory,
   $console            = $activemq::params::console,
   $package_type       = $activemq::params::package_type,
