@@ -1,13 +1,13 @@
-class activemq::package::tarball(
-  $version = '5.8.0',
-  $home = $activemq::home,
-  $user = $activemq::user,
-  $group = $activemq::group,
-  $system_user = $activemq::system_user) {
+class activemq::package::tarball (
+  $version      = '5.8.0',
+  $home         = $activemq::home,
+  $user         = $activemq::user,
+  $group        = $activemq::group,
+  $system_user  = $activemq::system_user,
+) {
 
   # wget from https://github.com/maestrodev/puppet-wget
   include wget
-
 
   if ! defined (User[$user]) {
     user { $user:

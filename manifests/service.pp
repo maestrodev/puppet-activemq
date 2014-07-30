@@ -1,4 +1,5 @@
-class activemq::service() inherits activemq::params {
+class activemq::service (
+) inherits activemq::params {
 
   service { 'activemq':
     name       => 'activemq',
