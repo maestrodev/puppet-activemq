@@ -66,7 +66,7 @@ class activemq (
     augeas { 'activemq-maxmemory':
       changes => [ "set wrapper.java.maxmemory ${max_memory}" ],
       incl    => $wrapper,
-      lens    => "Properties.lns",
+      lens    => 'Properties.lns',
       require => Anchor['activemq::package::end'],
       notify  => Service['activemq'],
     }
