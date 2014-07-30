@@ -36,6 +36,7 @@ class activemq::package::tarball (
     creates => "${home}/apache-activemq-${activemq::version}",
     path    => ['/bin'],
     before  => File["${home}/activemq"],
+    unless  => "test -f ${home}/apache-activemq-${version}",
   }
 
   file { "${home}/activemq":
