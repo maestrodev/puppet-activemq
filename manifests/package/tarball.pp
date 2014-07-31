@@ -33,7 +33,7 @@ class activemq::package::tarball (
   exec { 'activemq_untar':
     command => "tar xf /usr/local/src/apache-activemq-${version}-bin.tar.gz && chown -R ${user}:${group} ${home}/apache-activemq-${version}",
     cwd     => $home,
-    creates => "${home}/apache-activemq-${activemq::version}",
+    creates => "${home}/apache-activemq-${version}",
     path    => ['/bin'],
     before  => File["${home}/activemq"],
   }
