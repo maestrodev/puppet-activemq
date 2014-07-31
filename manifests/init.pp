@@ -27,7 +27,23 @@ class activemq (
   $console            = $activemq::params::console,
   $package_type       = $activemq::params::package_type,
   $architecture_flag  = $activemq::params::architecture_flag,
+  $activemqxml_source = undef,
 ) inherits activemq::params {
+
+  validate_re($package_type, '^rpm$|^tarball$')
+
+  if $activemqxml_source and (!$console or defined(Class['activemq::stomp'])) {
+    fail('If you set activemqxml_source, console needs to be true and active::stomp must not be defined.')
+  }
+
+  if $activemqxml_source {
+    file { "${activemq::home}/activemq/conf/activemq.xml":
+      ensure  =>  present,
+      owner   =>  $user,
+      group   =>  $group,
+      source  =>  $activemqxml_source,
+    }
+  }
 
   $wrapper = $package_type ? {
     'tarball' => "${home}/activemq/bin/linux-x86-${architecture_flag}/wrapper.conf",
