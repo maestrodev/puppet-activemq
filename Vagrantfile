@@ -3,6 +3,7 @@
 
 Vagrant.configure("2") do |config|
   config.vm.box = "centos-65-x64-virtualbox-puppet"
+  config.vm.box_url = "http://puppet-vagrant-boxes.puppetlabs.com/centos-65-x64-virtualbox-puppet.box"
   config.vm.network :forwarded_port, guest: 8161, host: 19000
   config.vm.network :forwarded_port, guest: 61613, host: 19001
 
