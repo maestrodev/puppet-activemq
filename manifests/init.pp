@@ -33,7 +33,7 @@ class activemq (
   validate_re($package_type, '^rpm$|^tarball$')
 
   if $activemqxml_source and (!$console or defined(Class['activemq::stomp'])) {
-    fail('If you set activemqxml_source, console needs to be true and active::stomp must not be defined.')
+    fail('If you set activemqxml_source, console needs to be true and activemq::stomp must not be defined.')
   }
 
   if $activemqxml_source {
