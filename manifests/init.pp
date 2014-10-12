@@ -15,21 +15,21 @@
 # This activemq class is currently targeting an X86_64 deploy, adjust as needed
 
 class activemq (
-  $apache_mirror      = "http://archive.apache.org/dist/activemq/",
+  $apache_mirror      = 'http://archive.apache.org/dist/activemq/',
   $version            = undef,
-  $home               = "/opt",
-  $user               = "activemq",
-  $group              = "activemq",
+  $home               = '/opt',
+  $user               = 'activemq',
+  $group              = 'activemq',
   $system_user        = true,
   $manage_user        = true,
   $manage_group       = true,
-  $max_memory         = "512M",
+  $max_memory         = '512M',
   $console            = true,
-  $package_type       = "tarball",
-  $data_dir           = "/var/lib/activemq",
-  $tmp_dir            = "/var/tmp/activemq",
-  $java_bin           = "",
-  $max_shutdown_wait  = "90",
+  $package_type       = 'tarball',
+  $data_dir           = '/var/lib/activemq',
+  $tmp_dir            = '/var/tmp/activemq',
+  $java_bin           = '',
+  $max_shutdown_wait  = '90',
   $activemqxml_source = undef,
   $activemqxml_parameters = undef,
 ) {
@@ -47,9 +47,9 @@ class activemq (
       ensure  =>  present,
       owner   =>  $user,
       group   =>  $group,
-      content => template("activemq/activemq-leveldb.xml.erb"),
-      require => Anchor["activemq::package::end"],
-      notify  => Service["activemq"], 
+      content => template("${activemqxml_source}"),
+      require => Anchor['activemq::package::end'],
+      notify  => Service['activemq'],
     }
   }
 
@@ -89,5 +89,4 @@ class activemq (
     enable     => true,
     require    => Anchor['activemq::package::end'],
   }
-
 }

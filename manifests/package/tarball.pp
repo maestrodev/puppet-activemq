@@ -22,10 +22,10 @@ class activemq::package::tarball (
 
   case $::osfamily {
     'Debian': {
-      $defaults_file = "/etc/default/activemq"
+      $defaults_file = '/etc/default/activemq'
     }
     default: {
-      $defaults_file = "/etc/sysconfig/activemq"
+      $defaults_file = '/etc/sysconfig/activemq'
     }
   }
 
@@ -95,15 +95,15 @@ class activemq::package::tarball (
     group   => $group,
     mode    => '0755',
   } ->
-  file { "/etc/init.d/activemq":
+  file {'/etc/init.d/activemq':
       ensure => 'link',
       source => 'puppet:///modules/activemq/activemq',
-      force => true,
-      owner   => root,
-      group   => root,
-      purge => true,
+      force  => true,
+      owner  => root,
+      group  => root,
+      purge  => true,
   } ->
-  file { "$defaults_file":
+  file { "${defaults_file}":
     owner   => 'root',
     group   => 'root',
     mode    => '0750',
