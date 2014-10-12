@@ -56,7 +56,7 @@ You can also install activemq from a yum repo
 
 See http://activemq.apache.org/replicated-leveldb-store.html
 
-   class { 'activemq':
+    class { 'activemq':
      version => '5.9.1',
      apache_mirror => 'http://mirror.dkd.de/apache/activemq/',
      user    => 'activemq',
