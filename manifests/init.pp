@@ -32,6 +32,11 @@ class activemq (
   $max_shutdown_wait  = '90',
   $activemqxml_source = undef,
   $activemqxml_parameters = undef,
+  $admin_user,
+  $admin_password,
+  $operating_user,
+  $operating_password,
+  $jmxport = "11099",
 ) {
 
   validate_re($package_type, '^rpm$|^tarball$')
@@ -40,6 +45,82 @@ class activemq (
 
   if $activemqxml_source and (!$console or defined(Class['activemq::stomp'])) {
     fail('If you set activemqxml_source, console needs to be true and activemq::stomp must not be defined.')
+  }
+
+
+  file { "${activemq::home}/activemq/conf/users.properties":
+      ensure  =>  present,
+      owner   =>  $user,
+      group   =>  $group,
+      mode    =>  600,
+      content => "
+# NOTE: This file is managed by puppet, changes will be reverted on next puppet run
+# <user> <password>
+${admin_user}=${admin_password}
+        ",
+      require => Anchor['activemq::package::end'],
+      notify  => Service['activemq'],
+  }
+
+  file { "${activemq::home}/activemq/conf/group.properties":
+      ensure  =>  present,
+      owner   =>  $user,
+      group   =>  $group,
+      mode    =>  600,
+      content => "
+# NOTE: This file is managed by puppet, changes will be reverted on next puppet run
+# role=<user>,<user>
+admins=${admin_user}
+#tempDestinationAdmins=
+#users=
+#guests=
+        ",
+      require => Anchor['activemq::package::end'],
+      notify  => Service['activemq'],
+  }
+
+
+  file { "${activemq::home}/activemq/conf/jmx.access":
+      ensure  =>  present,
+      owner   =>  $user,
+      group   =>  $group,
+      mode    =>  600,
+      content => "
+# NOTE: This file is managed by puppet, changes will be reverted on next puppet run
+# <user> <permission>
+${admin_user} readwrite
+${operating_user} readonly
+        ",
+      require => Anchor['activemq::package::end'],
+      notify  => Service['activemq'],
+  }
+  file { "${activemq::home}/activemq/conf/jmx.password":
+      ensure  =>  present,
+      owner   =>  $user,
+      group   =>  $group,
+      mode    =>  600,
+      content => "
+# NOTE: This file is managed by puppet, changes will be reverted on next puppet run
+# <user> <password>
+${admin_user} ${admin_password}
+${operating_user} ${operating_password}
+        ",
+      require => Anchor['activemq::package::end'],
+      notify  => Service['activemq'],
+  }
+  file { "${activemq::home}/activemq/conf/jetty-realm.properties":
+      ensure  =>  present,
+      owner   =>  $user,
+      group   =>  $group,
+      mode    =>  600,
+      content => "
+# NOTE: This file is managed by puppet, changes will be reverted on next puppet run
+# <user>: <password>, <role>
+${admin_user}: ${admin_password}, admin
+${operating_user}: ${operating_password}, user
+        ",
+      require => Anchor['activemq::package::end'],
+      notify  => Service['activemq'],
   }
 
   if $activemqxml_source {
