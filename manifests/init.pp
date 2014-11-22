@@ -15,25 +15,112 @@
 # This activemq class is currently targeting an X86_64 deploy, adjust as needed
 
 class activemq (
-  $apache_mirror      = $activemq::params::apache_mirror,
+  $apache_mirror      = 'http://archive.apache.org/dist/activemq/',
   $version            = undef,
-  $home               = $activemq::params::home,
-  $user               = $activemq::params::user,
-  $group              = $activemq::params::group,
-  $system_user        = $activemq::params::system_user,
-  $manage_user        = $activemq::params::manage_user,
-  $manage_group       = $activemq::params::manage_group,
-  $max_memory         = $activemq::params::max_memory,
-  $console            = $activemq::params::console,
-  $package_type       = $activemq::params::package_type,
-  $architecture_flag  = $activemq::params::architecture_flag,
+  $home               = '/opt',
+  $user               = 'activemq',
+  $group              = 'activemq',
+  $system_user        = true,
+  $manage_user        = true,
+  $manage_group       = true,
+  $max_memory         = '512M',
+  $console            = true,
+  $package_type       = 'tarball',
+  $data_dir           = '/var/lib/activemq',
+  $tmp_dir            = '/var/tmp/activemq',
+  $java_bin           = '',
+  $max_shutdown_wait  = '90',
   $activemqxml_source = undef,
-) inherits activemq::params {
+  $activemqxml_parameters = undef,
+  $admin_user,
+  $admin_password,
+  $operating_user,
+  $operating_password,
+  $jmxport = "11099",
+) {
 
   validate_re($package_type, '^rpm$|^tarball$')
+  validate_re($max_memory, '^[0-9][0-9]*[GM]$')
+  validate_re($max_shutdown_wait, '^[0-9][0-9]*$')
 
   if $activemqxml_source and (!$console or defined(Class['activemq::stomp'])) {
     fail('If you set activemqxml_source, console needs to be true and activemq::stomp must not be defined.')
+  }
+
+
+  file { "${activemq::home}/activemq/conf/users.properties":
+      ensure  =>  present,
+      owner   =>  $user,
+      group   =>  $group,
+      mode    =>  600,
+      content => "
+# NOTE: This file is managed by puppet, changes will be reverted on next puppet run
+# <user> <password>
+${admin_user}=${admin_password}
+        ",
+      require => Anchor['activemq::package::end'],
+      notify  => Service['activemq'],
+  }
+
+  file { "${activemq::home}/activemq/conf/group.properties":
+      ensure  =>  present,
+      owner   =>  $user,
+      group   =>  $group,
+      mode    =>  600,
+      content => "
+# NOTE: This file is managed by puppet, changes will be reverted on next puppet run
+# role=<user>,<user>
+admins=${admin_user}
+#tempDestinationAdmins=
+#users=
+#guests=
+        ",
+      require => Anchor['activemq::package::end'],
+      notify  => Service['activemq'],
+  }
+
+
+  file { "${activemq::home}/activemq/conf/jmx.access":
+      ensure  =>  present,
+      owner   =>  $user,
+      group   =>  $group,
+      mode    =>  600,
+      content => "
+# NOTE: This file is managed by puppet, changes will be reverted on next puppet run
+# <user> <permission>
+${admin_user} readwrite
+${operating_user} readonly
+        ",
+      require => Anchor['activemq::package::end'],
+      notify  => Service['activemq'],
+  }
+  file { "${activemq::home}/activemq/conf/jmx.password":
+      ensure  =>  present,
+      owner   =>  $user,
+      group   =>  $group,
+      mode    =>  600,
+      content => "
+# NOTE: This file is managed by puppet, changes will be reverted on next puppet run
+# <user> <password>
+${admin_user} ${admin_password}
+${operating_user} ${operating_password}
+        ",
+      require => Anchor['activemq::package::end'],
+      notify  => Service['activemq'],
+  }
+  file { "${activemq::home}/activemq/conf/jetty-realm.properties":
+      ensure  =>  present,
+      owner   =>  $user,
+      group   =>  $group,
+      mode    =>  600,
+      content => "
+# NOTE: This file is managed by puppet, changes will be reverted on next puppet run
+# <user>: <password>, <role>
+${admin_user}: ${admin_password}, admin
+${operating_user}: ${operating_password}, user
+        ",
+      require => Anchor['activemq::package::end'],
+      notify  => Service['activemq'],
   }
 
   if $activemqxml_source {
@@ -41,13 +128,10 @@ class activemq (
       ensure  =>  present,
       owner   =>  $user,
       group   =>  $group,
-      source  =>  $activemqxml_source,
+      content => template("${activemqxml_source}"),
+      require => Anchor['activemq::package::end'],
+      notify  => Service['activemq'],
     }
-  }
-
-  $wrapper = $package_type ? {
-    'tarball' => "${home}/activemq/bin/linux-x86-${architecture_flag}/wrapper.conf",
-    'rpm'     => '/etc/activemq/activemq-wrapper.conf',
   }
 
   case $package_type {
@@ -78,15 +162,12 @@ class activemq (
     }
   }
 
-  if $max_memory != undef {
-    augeas { 'activemq-maxmemory':
-      changes => [ "set wrapper.java.maxmemory ${max_memory}" ],
-      incl    => $wrapper,
-      lens    => 'Properties.lns',
-      require => Anchor['activemq::package::end'],
-      notify  => Service['activemq'],
-    }
+  service { 'activemq':
+    ensure     => running,
+    name       => 'activemq',
+    hasrestart => true,
+    hasstatus  => true,
+    enable     => true,
+    require    => Anchor['activemq::package::end'],
   }
-
-  class { 'activemq::service': }
 }
