@@ -32,9 +32,16 @@ class activemq::package::tarball (
       }
     }
   }
+  
+  if ( $version =~ /^(5.1\d.\d*)/ ) or ( $version == '5.9.1' ) {
+    $apache_mirror = "${activemq::apache_mirror}/activemq"
+  }
+  else {
+    $apache_mirror = "${activemq::apache_mirror}/activemq/apache-activemq"
+  }
 
   wget::fetch { 'activemq_download':
-    source      => "${activemq::apache_mirror}/activemq/apache-activemq/${version}/apache-activemq-${version}-bin.tar.gz",
+    source      => "${apache_mirror}/${version}/apache-activemq-${version}-bin.tar.gz",
     destination => "/usr/local/src/apache-activemq-${version}-bin.tar.gz",
   } ->
   exec { 'activemq_untar':
