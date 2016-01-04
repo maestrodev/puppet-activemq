@@ -28,6 +28,7 @@ class activemq (
   $package_type       = $activemq::params::package_type,
   $architecture_flag  = $activemq::params::architecture_flag,
   $activemqxml_source = undef,
+  $activemqxml_content = undef,
 ) inherits activemq::params {
 
   validate_re($package_type, '^rpm$|^tarball$')
@@ -35,13 +36,28 @@ class activemq (
   if $activemqxml_source and (!$console or defined(Class['activemq::stomp'])) {
     fail('If you set activemqxml_source, console needs to be true and activemq::stomp must not be defined.')
   }
+  
+  if $activemqxml_source and $activemqxml_content {
+    fail('The content of the activemq configuration may only be defined as a constant file or erb template')
+  }
 
   if $activemqxml_source {
     file { "${activemq::home}/activemq/conf/activemq.xml":
       ensure  =>  present,
       owner   =>  $user,
       group   =>  $group,
+      mode    =>  '0400',
       source  =>  $activemqxml_source,
+    }
+  }
+  
+  if $activemqxml_content {
+    file { "${activemq::home}/activemq/conf/activemq.xml":
+      ensure  =>  present,
+      owner   =>  $user,
+      group   =>  $group,
+      mode    =>  '0400',
+      content  =>  $activemqxml_content,
     }
   }
 

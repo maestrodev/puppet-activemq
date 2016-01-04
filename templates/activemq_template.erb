@@ -1,0 +1,161 @@
+<beans
+  xmlns="http://www.springframework.org/schema/beans"
+  xmlns:amq="http://activemq.apache.org/schema/core"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.0.xsd
+  http://activemq.apache.org/schema/core http://activemq.apache.org/schema/core/activemq-core.xsd
+  http://activemq.apache.org/camel/schema/spring http://activemq.apache.org/camel/schema/spring/camel-spring.xsd">
+  <bean class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
+    <!--        <property name="locations">
+      <value>file:${activemq.base}/conf/credentials.properties</value>
+      </property> -->
+  </bean>
+  <!--
+    For more information about what MCollective requires in this file,
+    see http://docs.puppetlabs.com/mcollective/deploy/middleware/activemq.html
+    -->
+  <!--
+    WARNING: The elements that are direct children of <broker> MUST BE IN
+    ALPHABETICAL ORDER. This is fixed in ActiveMQ 5.6.0, but affects
+    previous versions back to 5.4.
+    https://issues.apache.org/jira/browse/AMQ-3570
+    -->
+  <broker xmlns="http://activemq.apache.org/schema/core" brokerName="localhost" useJmx="true" schedulePeriodForDestinationPurge="60000" persistent="false">
+    <!--
+      MCollective generally expects producer flow control to be turned off.
+      It will also generate a limitless number of single-use reply queues,
+      which should be garbage-collected after about five minutes to conserve
+      memory.
+      For more information, see:
+      http://activemq.apache.org/producer-flow-control.html
+      -->
+    <destinationPolicy>
+      <policyMap>
+        <policyEntries>
+          <policyEntry topic=">" producerFlowControl="false">
+            <!-- The constantPendingMessageLimitStrategy is used to prevent
+              slow topic consumers to block producers and affect other consumers
+              by limiting the number of messages that are retained
+              For more information, see:
+              http://activemq.apache.org/slow-consumer-handling.html
+              -->
+            <pendingMessageLimitStrategy>
+              <constantPendingMessageLimitStrategy limit="1000"/>
+            </pendingMessageLimitStrategy>
+          </policyEntry>
+          <policyEntry queue="*.reply.>" gcInactiveDestinations="true" inactiveTimoutBeforeGC="300000" >
+            <!-- The constantPendingMessageLimitStrategy is used to prevent
+              slow topic consumers to block producers and affect other consumers
+              by limiting the number of messages that are retained
+              For more information, see:
+              http://activemq.apache.org/slow-consumer-handling.html
+              -->
+            <pendingMessageLimitStrategy>
+              <constantPendingMessageLimitStrategy limit="1000"/>
+            </pendingMessageLimitStrategy>
+          </policyEntry>
+        </policyEntries>
+      </policyMap>
+    </destinationPolicy>
+    <managementContext>
+      <managementContext createConnector="false"/>
+    </managementContext>
+    <!--
+      Configure message persistence for the broker. The default persistence
+      mechanism is the KahaDB store (identified by the kahaDB tag).
+      For more information, see:
+      http://activemq.apache.org/persistence.html
+      -->
+    <persistenceAdapter>
+      <kahaDB directory="${activemq.data}/kahadb"/>
+    </persistenceAdapter>
+    <plugins>
+      <statisticsBrokerPlugin/>
+      <!--
+        This configures the users and groups used by this broker. Groups
+        are referenced below, in the write/read/admin attributes
+        of each authorizationEntry element.
+        -->
+      <simpleAuthenticationPlugin>
+        <users>
+          <authenticationUser username="<%= @middleware_user %>" password="<%= @middleware_password %>" groups="mcollective,everyone"/>
+          <authenticationUser username="<%= @middleware_admin_user %>" password="<%= @middleware_admin_password %>" groups="mcollective,admins,everyone"/>
+        </users>
+      </simpleAuthenticationPlugin>
+      <!--
+        Configure which users are allowed to read and write where. Permissions
+        are organized by group; groups are configured above, in the
+        authentication plugin.
+        With the rules below, both servers and admin users belong to group
+        mcollective, which can both issue and respond to commands. For an
+        example that splits permissions and doesn't allow servers to issue
+        commands, see:
+        http://docs.puppetlabs.com/mcollective/deploy/middleware/activemq.html#detailed-restrictions
+        -->
+      <authorizationPlugin>
+        <map>
+          <authorizationMap>
+            <authorizationEntries>
+              <authorizationEntry queue=">" write="admins" read="admins" admin="admins" />
+              <authorizationEntry topic=">" write="admins" read="admins" admin="admins" />
+              <authorizationEntry topic="mcollective.>" write="mcollective" read="mcollective" admin="mcollective" />
+              <authorizationEntry queue="mcollective.>" write="mcollective" read="mcollective" admin="mcollective" />
+              <!--
+                The advisory topics are part of ActiveMQ, and all users need access to them.
+                The "everyone" group is not special; you need to ensure every user is a member.
+                -->
+              <authorizationEntry topic="ActiveMQ.Advisory.>" read="everyone" write="everyone" admin="everyone"/>
+            </authorizationEntries>
+          </authorizationMap>
+        </map>
+      </authorizationPlugin>
+    </plugins>
+    <sslContext>
+      <sslContext
+        keyStore="keystore.jks" keyStorePassword="puppet"
+        trustStore="truststore.jks" trustStorePassword="puppet"
+        />
+    </sslContext>
+    <!--
+      The systemUsage controls the maximum amount of space the broker will
+      use for messages. For more information, see:
+      http://docs.puppetlabs.com/mcollective/deploy/middleware/activemq.html#memory-and-temp-usage-for-messages-systemusage
+      -->
+    <systemUsage>
+      <systemUsage>
+        <memoryUsage>
+          <memoryUsage limit="<%= @memoryusage %>"/>
+        </memoryUsage>
+        <storeUsage>
+          <storeUsage limit="<%= @storeusage %>" name="foo"/>
+        </storeUsage>
+        <tempUsage>
+          <tempUsage limit="<%= @tempusage %>"/>
+        </tempUsage>
+      </systemUsage>
+    </systemUsage>
+    <!--
+      The transport connectors allow ActiveMQ to listen for connections over
+      a given protocol. MCollective uses Stomp, and other ActiveMQ brokers
+      use OpenWire. You'll need different URLs depending on whether you are
+      using TLS. For more information, see:
+      http://docs.puppetlabs.com/mcollective/deploy/middleware/activemq.html#transport-connectors
+      -->
+    <transportConnectors>
+      <!-- DOS protection, limit concurrent connections to 1000 and frame size to 100MB -->
+      <transportConnector name="stomp+nio+ssl" uri="stomp+ssl://0.0.0.0:<%= @middleware_ssl_port %>?needClientAuth=true&amp;transport.enabledProtocols=TLSv1,TLSv1.1,TLSv1.2&amp;maximumConnections=1000&amp;wireFormat.maxFrameSize=104857600"/>
+    </transportConnectors>
+    <!-- destroy the spring context on shutdown to stop jetty -->
+    <shutdownHooks>
+      <bean xmlns="http://www.springframework.org/schema/beans" class="org.apache.activemq.hooks.SpringContextHook" />
+    </shutdownHooks>
+  </broker>
+  <% if @console %>
+  <!--
+    Enable web consoles, REST and Ajax APIs and demos.
+    It also includes Camel (with its web console); see ${ACTIVEMQ_HOME}/conf/camel.xml for more info.
+    See ${ACTIVEMQ_HOME}/conf/jetty.xml for more details.
+    -->
+  <import resource="jetty.xml"/>
+  <% end %>
+</beans>
