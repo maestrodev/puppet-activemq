@@ -46,6 +46,7 @@ class activemq (
       ensure  =>  present,
       owner   =>  $user,
       group   =>  $group,
+      mode    =>  '0400',
       source  =>  $activemqxml_source,
     }
   }
