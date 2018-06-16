@@ -27,6 +27,7 @@ class activemq (
   $console            = $activemq::params::console,
   $package_type       = $activemq::params::package_type,
   $architecture_flag  = $activemq::params::architecture_flag,
+  $java_exec          = $activemq::params::java_exec,
   $activemqxml_source = undef,
 ) inherits activemq::params {
 
