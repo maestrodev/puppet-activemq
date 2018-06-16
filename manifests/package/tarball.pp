@@ -6,6 +6,7 @@ class activemq::package::tarball (
   $system_user  = $activemq::system_user,
   $manage_user  = $activemq::manage_user,
   $manage_group = $activemq::manage_group,
+  $java_exec    = $activemq::java_exec,
 ) {
 
   # wget from https://github.com/maestrodev/puppet-wget
