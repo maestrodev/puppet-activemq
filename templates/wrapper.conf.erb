@@ -62,10 +62,16 @@ wrapper.java.additional.13=-Dhawtio.role=admins
 wrapper.java.additional.14=-Dhawtio.rolePrincipalClasses=org.apache.activemq.jaas.GroupPrincipal
 wrapper.java.additional.15=-Djava.security.auth.login.config=%ACTIVEMQ_CONF%/login.config
 
+<% if @enable_jmx -%>
+wrapper.java.additional.n=-Dcom.sun.management.jmxremote.port=1616
+wrapper.java.additional.n=-Dcom.sun.management.jmxremote.authenticate=false
+wrapper.java.additional.n=-Dcom.sun.management.jmxremote.ssl=false
+<% else -%>
 # Uncomment to enable jmx
 #wrapper.java.additional.n=-Dcom.sun.management.jmxremote.port=1616 
 #wrapper.java.additional.n=-Dcom.sun.management.jmxremote.authenticate=false 
 #wrapper.java.additional.n=-Dcom.sun.management.jmxremote.ssl=false
+<% end -%>
 
 # Uncomment to enable YourKit profiling
 #wrapper.java.additional.n=-Xrunyjpagent
@@ -75,10 +81,14 @@ wrapper.java.additional.15=-Djava.security.auth.login.config=%ACTIVEMQ_CONF%/log
 #wrapper.java.additional.n=-Xrunjdwp:transport=dt_socket,server=y,suspend=n,address=5005
 
 # Initial Java Heap Size (in MB)
+<% if @set_java_initmemory -%>
+wrapper.java.initmemory=<%= @java_initmemory %>
+<% else -%>
 #wrapper.java.initmemory=3
+<% end -%>
 
 # Maximum Java Heap Size (in MB)
-wrapper.java.maxmemory=1024
+wrapper.java.maxmemory=<%= @java_maxmemory %>
 
 # Application parameters.  Add parameters as needed starting from 1
 wrapper.app.parameter.1=org.apache.activemq.console.Main

@@ -28,6 +28,12 @@ class activemq (
   $package_type       = $activemq::params::package_type,
   $architecture_flag  = $activemq::params::architecture_flag,
   $activemqxml_source = undef,
+  $serviceensure      = $activemq::params::ensure,
+  $serviceenable      = $activemq::params::enable,
+  $enable_jmx          = $activemq::params::enable_jmx,
+  $set_java_initmemory = $activemq::params::set_java_initmemory,
+  $java_initmemory     = $activemq::params::java_initmemory,
+  $java_maxmemory      = $activemq::params::java_maxmemory,
 ) inherits activemq::params {
 
   validate_re($package_type, '^rpm$|^tarball$')
@@ -48,6 +54,10 @@ class activemq (
   $wrapper = $package_type ? {
     'tarball' => "${home}/activemq/bin/linux-x86-${architecture_flag}/wrapper.conf",
     'rpm'     => '/etc/activemq/activemq-wrapper.conf',
+  }
+
+  $activemqxml = $package_type ? {
+    'tarball' => "${home}/activemq/conf/activemq.xml",
   }
 
   case $package_type {

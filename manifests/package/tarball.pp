@@ -6,6 +6,10 @@ class activemq::package::tarball (
   $system_user  = $activemq::system_user,
   $manage_user  = $activemq::manage_user,
   $manage_group = $activemq::manage_group,
+  $enable_jmx          = $activemq::enable_jmx,
+  $set_java_initmemory = $activemq::set_java_initmemory,
+  $java_initmemory     = $activemq::java_initmemory,
+  $java_maxmemory      = $activemq::java_maxmemory,
 ) {
 
   # wget from https://github.com/maestrodev/puppet-wget
@@ -82,6 +86,16 @@ class activemq::package::tarball (
     group   => $group,
     mode    => '0644',
     content => template('activemq/wrapper.conf.erb'),
+    require => [File["${home}/activemq"],File['/etc/init.d/activemq']],
+    notify  => Service['activemq'],
+  }
+
+  file { 'activemq.xml':
+    path    => $activemq::activemqxml,
+    owner   => $user,
+    group   => $group,
+    mode    => '0644',
+    content => template('activemq/activemq.xml.erb'),
     require => [File["${home}/activemq"],File['/etc/init.d/activemq']],
     notify  => Service['activemq'],
   }
